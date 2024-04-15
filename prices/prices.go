@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strconv"
+	"github.com/Chidinma21/Price-Calculator/conversion"
 )
 
 type TaxIncludedPriceJob struct{
@@ -53,18 +53,12 @@ func (job *TaxIncludedPriceJob) LoadData() {
 		file.Close()
 		return
 	}
-
-	prices := make([]float64, len(lines))
-
-	for index, value := range lines {
-		floatPrice, err := strconv.ParseFloat(value, 64)
-		if err != nil {
-			fmt.Println("Float conversion failed")
-			fmt.Println(err)
-			file.Close()
-			return
-		}
-		prices[index] = floatPrice
+	
+	prices, err := conversion.StringsToFloat(lines)
+	if err != nil {
+		fmt.Println(err)
+		file.Close()
+		return
 	}
 
 	job.InputPrices = prices
