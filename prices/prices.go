@@ -1,16 +1,15 @@
 package prices
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"github.com/Chidinma21/Price-Calculator/conversion"
+	"github.com/Chidinma21/Price-Calculator/filemanager"
 )
 
 type TaxIncludedPriceJob struct{
 	TaxRate float64
 	InputPrices []float64
-	TaxIncludedPrices map[string]float64
+	TaxIncludedPrices map[string]string
 }
 
 func (job *TaxIncludedPriceJob) Process() {
@@ -20,7 +19,8 @@ func (job *TaxIncludedPriceJob) Process() {
 		taxIncludedPrice := price * (1 + job.TaxRate)
 		result[fmt.Sprintf("%.2f",price)] = fmt.Sprintf("%.2f", taxIncludedPrice)
 	}
-	fmt.Println(result)
+	job.TaxIncludedPrices = result
+	filemanager.WriteJSON(fmt.Sprintf("result_%.0f.json", job.TaxRate*100), job)
 }
 
 func NewTaxIncludedPriceJob(taxRate float64) *TaxIncludedPriceJob {
@@ -31,33 +31,17 @@ func NewTaxIncludedPriceJob(taxRate float64) *TaxIncludedPriceJob {
 }
 
 func (job *TaxIncludedPriceJob) LoadData() {
-	file, err := os.Open("prices.txt")
+
+	lines, err := filemanager.ReadLines("prices.txt")
 
 	if err != nil {
-		fmt.Println("An error occurred")
 		fmt.Println(err)
-		return 
-	}
-
-	scanner := bufio.NewScanner(file)
-	var lines []string
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-
-	err = scanner.Err()
-
-	if err != nil {
-		fmt.Println("Reading file content failed")
-		fmt.Println(err)
-		file.Close()
 		return
 	}
 	
 	prices, err := conversion.StringsToFloat(lines)
 	if err != nil {
 		fmt.Println(err)
-		file.Close()
 		return
 	}
 
