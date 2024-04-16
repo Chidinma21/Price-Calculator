@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func StringsToFloat (s []string) ([]float64, error) {
+func StringsToFloat(s []string) ([]float64, error) {
 	floats := make([]float64, len(s))
 	for index, value := range s {
 		float, err := strconv.ParseFloat(value, 64)
